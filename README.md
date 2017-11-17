@@ -26,3 +26,6 @@ Following methods are included:
  The graph will be read from a .txt file. There are samples on the folder input.
  
  They were taken from: [VisuAlgo - Graph Data Structures](https://visualgo.net/en/graphds)
+
+## License
+This code is released under MIT License.
