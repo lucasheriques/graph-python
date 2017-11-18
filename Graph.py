@@ -5,12 +5,19 @@ import sys
 class Graph:
     # reads graph from file
     def __init__(self):
-        with open("input/in8.txt") as file:
+        with open("input/in7.txt") as file:
             self.graph = [line.split() for line in file]
         for x in range(len(self.graph)):
             self.graph[x] = list(map(int, self.graph[x]))
         self.time = 0
         self.print_graph()
+
+    # clones the graph
+    def clone(self):
+        new = []
+        for i in self.graph:
+            new.append(list(i))
+        return new
 
     # PARTE 1
     # prints number of vertices
@@ -62,8 +69,8 @@ class Graph:
             for e, edge in enumerate(vertex):
                 # checks for auto loop
                 if e != i and edge != 0:
-                    neighbors.append(e+1)
-            print("O vértice", i+1, "possui grau", len(neighbors), "e seus vizinhos são:", neighbors)
+                    neighbors.append(e)
+            print("O vértice", i, "possui grau", len(neighbors), "e seus vizinhos são:", neighbors)
 
     # returns degree of vertex
     def vertex_degree(self, vertex):
@@ -169,7 +176,7 @@ class Graph:
         return complementary
 
     # checks if the graph is bipartite
-    # TODO
+    # complexity is O(n^2)
     def bipartite_graph(self):
         bipartite = True
         colors = [-1] * len(self.graph)
@@ -199,6 +206,7 @@ class Graph:
     # complexity is O(n^2)
     def dfs(self):
         visited = [False]*(len(self.graph))
+        print("DFS search:", end=' ')
         for v in range(len(visited)):
             if visited[v] is False:
                 self.dfs_visit(v, visited)
@@ -216,7 +224,7 @@ class Graph:
     def bfs(self, start=0):
         queue = deque()
         visited = [False]*(len(self.graph))
-
+        print("BFS search:", end=' ')
         for v in range(len(self.graph)):
             if visited[v] is False:
                 visited[v] = True
@@ -278,7 +286,8 @@ class Graph:
         parent = [None] * len(self.graph)
         key = [sys.maxsize] * len(self.graph)
         key[0] = 0
-
+        cont = 1
+        cost = 0
         parent[0] = -1
 
         for x in range(len(self.graph)):  # O(n)
@@ -289,7 +298,10 @@ class Graph:
                 if 0 < weight < key[e] and e not in mstset:
                     parent[e] = v
                     key[e] = weight
-            print(mstset)
+                    cost += weight
+                    print("{} aresta ({}, {}): {}".format(cont, v, e, weight))
+                    cont += 1
+        print("Custo:", cost)
 
     # Kruskal
     # complexity is O(n^3), since we have a while loop to guarantee we'll be getting
@@ -313,13 +325,15 @@ class Graph:
             rank[root1] += 1
 
     def kruskal(self):
-        graph = self.graph
+        g = self.clone()
         cont = 1
-        parent = [x for x in range(len(graph))]
-        rank = [0] * len(graph)
-        while cont <= len(graph) - 1:  # O(n)
+        cost = 0
+        parent = [x for x in range(len(g))]
+        rank = [0] * len(g)
+        print("Algoritmo de Kruskal - ordem de acesso dos vértices")
+        while cont <= len(g) - 1:  # O(n)
             min_value = sys.maxsize
-            for i, edges in enumerate(graph):  # O(n)
+            for i, edges in enumerate(g):  # O(n)
                 for v, weight in enumerate(edges):  # O(n)
                     if 0 < weight < min_value:
                         min_value = weight
@@ -330,12 +344,15 @@ class Graph:
             if set1 != set2:
                 print("{} aresta ({}, {}): {}".format(cont, v1, v2, min_value))
                 cont += 1
+                cost += min_value
                 self.union(parent, rank, set1, set2)
-            graph[v1][v2] = graph[v2][v1] = -1
+            g[v1][v2] = g[v2][v1] = -1
+        print("Custo:", cost)
 
     # prints cut_vertices
     # complexity is O(n^2), since O(n) for each vertex, then another O(n) for checking
     # if vertex is a cut-vertex
+    # conferir
     def cut_vetices_util(self, u, visited, ap, parent, low, disc):
         children = 0
         visited[u] = True
@@ -397,8 +414,8 @@ g.regular_graph()
 g.complete_graph()
 g.eulerian_graph()
 g.unicursal_graph()
-g.complementary_graph()
 g.bipartite_graph()
+g.complementary_graph()
 g.dfs()
 g.bfs()
 g.is_tree()
